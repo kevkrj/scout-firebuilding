@@ -6,37 +6,22 @@
 <title>Scout Firebuilding Competition</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #1a1008;
-  --bg-card: #2a1c0e;
-  --bg-input: #3a2a18;
-  --border: #5a3a1a;
-  --text: #f0dcc0;
-  --text-dim: #a08060;
-  --orange: #e87020;
-  --amber: #f0a030;
-  --gold: #ffd700;
-  --green: #40a040;
-  --green-dim: #1a3a1a;
-  --red: #d03030;
-  --red-dim: #3a1010;
+  --bg: #1a1008; --bg-card: #2a1c0e; --bg-input: #3a2a18;
+  --border: #5a3a1a; --text: #f0dcc0; --text-dim: #a08060;
+  --orange: #e87020; --amber: #f0a030; --gold: #ffd700;
+  --green: #40a040; --green-dim: #1a3a1a;
+  --red: #d03030; --red-dim: #3a1010;
   --radius: 10px;
 }
-
 html { font-size: 16px; }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  -webkit-tap-highlight-color: transparent;
+  background: var(--bg); color: var(--text);
+  min-height: 100dvh; -webkit-tap-highlight-color: transparent;
 }
-
 .screen { display: none; padding: 16px; padding-bottom: 100px; max-width: 600px; margin: 0 auto; }
 .screen.active { display: block; }
-
 h1 { font-size: 1.5rem; text-align: center; color: var(--amber); margin-bottom: 16px; }
 h2 { font-size: 1.2rem; color: var(--amber); margin-bottom: 12px; }
 h3 { font-size: 1rem; color: var(--text-dim); margin-bottom: 8px; }
@@ -48,6 +33,7 @@ h3 { font-size: 1rem; color: var(--text-dim); margin-bottom: 8px; }
   cursor: pointer; text-align: left; transition: background 0.15s;
 }
 .btn:active { background: var(--bg-input); }
+.btn:disabled { opacity: 0.4; pointer-events: none; }
 .btn-orange { background: var(--orange); color: #fff; border-color: var(--orange); text-align: center; font-weight: 600; }
 .btn-orange:active { background: #c05818; }
 .btn-red { background: var(--red); color: #fff; border-color: var(--red); text-align: center; }
@@ -74,15 +60,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
 .input-row input { flex: 1; }
 
-.competitor-item {
+.team-item {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px; margin-bottom: 6px; border-radius: var(--radius);
   background: var(--bg-card); border: 1px solid var(--border); cursor: pointer;
 }
-.competitor-item.scored { background: var(--green-dim); border-color: var(--green); }
-.competitor-item .name { flex: 1; font-size: 1rem; }
-.competitor-item .badge { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: var(--green); color: #fff; }
-.competitor-item .remove-btn { color: var(--red); font-size: 1.2rem; padding: 4px 8px; cursor: pointer; background: none; border: none; }
+.team-item.scored { background: var(--green-dim); border-color: var(--green); }
+.team-item .name { flex: 1; font-size: 1rem; }
+.team-item .badge { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: var(--green); color: #fff; }
+.team-item .remove-btn { color: var(--red); font-size: 1.2rem; padding: 4px 8px; cursor: pointer; background: none; border: none; }
 
 .criterion-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .criterion-row label { flex: 1; font-size: 0.95rem; line-height: 1.3; }
@@ -104,16 +90,31 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .lb-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--amber)); border-radius: 4px; transition: width 0.3s; }
 .lb-cats { display: flex; flex-wrap: wrap; gap: 4px; }
 .lb-cat { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: var(--bg-input); color: var(--text-dim); }
+.lb-cat.time-cat { background: var(--orange); color: #fff; }
 
-.timer-display { text-align: center; padding: 40px 16px; }
-.timer-time { font-size: 5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--amber); line-height: 1; margin-bottom: 20px; }
+.timer-display { text-align: center; padding: 20px 16px; }
+.timer-time { font-size: 5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--amber); line-height: 1; margin-bottom: 16px; }
 .timer-time.urgent { color: var(--red); animation: pulse 1s infinite; }
 .timer-time.done { color: var(--red); }
-.timer-label { font-size: 1.5rem; color: var(--text-dim); margin-bottom: 30px; }
-.timer-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.timer-label { font-size: 1.5rem; color: var(--text-dim); margin-bottom: 20px; }
+.timer-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
 .timer-controls .btn { width: auto; min-width: 120px; text-align: center; }
 
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.mark-section { border-top: 1px solid var(--border); padding-top: 16px; }
+.mark-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; margin-bottom: 6px; border-radius: var(--radius);
+  background: var(--bg-card); border: 1px solid var(--border);
+}
+.mark-item.marked { background: var(--green-dim); border-color: var(--green); }
+.mark-item .name { flex: 1; font-size: 1rem; }
+.mark-item .mark-time { color: var(--amber); font-weight: 600; font-size: 0.9rem; margin-right: 10px; }
+.mark-item .mark-pts { color: var(--text-dim); font-size: 0.8rem; margin-right: 10px; }
+.mark-btn { background: var(--orange); color: #fff; border: none; border-radius: var(--radius); padding: 8px 16px; font-size: 0.9rem; cursor: pointer; font-weight: 600; }
+.mark-btn:active { background: #c05818; }
+.undo-btn { background: var(--bg-input); color: var(--text-dim); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; font-size: 0.8rem; cursor: pointer; }
 
 .toast {
   position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -121,6 +122,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
   font-size: 0.95rem; z-index: 1000; opacity: 0; transition: opacity 0.3s;
   pointer-events: none; white-space: nowrap;
 }
+.toast.error { background: var(--red); }
 .toast.show { opacity: 1; }
 
 .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
@@ -137,8 +139,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
 .admin-section { margin-bottom: 24px; }
 .admin-section h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-
 .empty-state { text-align: center; color: var(--text-dim); padding: 40px 16px; font-size: 1rem; }
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.status-dot.live { background: var(--green); }
+.status-dot.off { background: var(--red); }
+.status-bar { text-align: center; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -146,15 +151,16 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 <!-- HOME -->
 <div id="home" class="screen active">
   <h1>Scout Firebuilding Competition</h1>
+  <div id="homeStatus" class="status-bar"></div>
   <div class="nav-grid">
     <button class="btn" onclick="showScreen('admin')"><span class="nav-emoji">&#9881;</span>Admin</button>
     <button class="btn" onclick="showScreen('timer-view')"><span class="nav-emoji">&#9201;</span>Timer</button>
     <button class="btn" onclick="showJudge(0)"><span class="nav-emoji">&#128737;</span>Safety</button>
     <button class="btn" onclick="showJudge(1)"><span class="nav-emoji">&#128293;</span>Fire Lay</button>
     <button class="btn" onclick="showJudge(2)"><span class="nav-emoji">&#128736;</span>Technique</button>
-    <button class="btn" onclick="showJudge(3)"><span class="nav-emoji">&#127775;</span>Fire Performance</button>
+    <button class="btn" onclick="showJudge(3)"><span class="nav-emoji">&#127775;</span>Fire Perf</button>
     <button class="btn" onclick="showJudge(4)"><span class="nav-emoji">&#127807;</span>LNT / Cleanup</button>
-    <button class="btn btn-orange" onclick="showScreen('leaderboard')" style="grid-column: 1 / -1"><span class="nav-emoji">&#127942;</span>Leaderboard</button>
+    <button class="btn btn-orange" onclick="showScreen('leaderboard')" style="grid-column:1/-1"><span class="nav-emoji">&#127942;</span>Leaderboard</button>
   </div>
 </div>
 
@@ -164,17 +170,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
     <h1>Admin</h1>
   </div>
-
   <div class="admin-section">
-    <h2>Competitors</h2>
+    <h2>Teams</h2>
     <div class="input-row">
-      <input type="text" id="newName" placeholder="Competitor name" maxlength="60"
-             onkeydown="if(event.key==='Enter')addCompetitor()">
-      <button class="btn btn-orange btn-sm" onclick="addCompetitor()">Add</button>
+      <input type="text" id="newName" placeholder="Team name" maxlength="60"
+             onkeydown="if(event.key==='Enter')addTeam()">
+      <button class="btn btn-orange btn-sm" onclick="addTeam()">Add</button>
     </div>
-    <div id="competitorList"></div>
+    <div id="teamList"></div>
   </div>
-
   <div class="admin-section">
     <h2>Timer</h2>
     <div class="timer-config">
@@ -187,11 +191,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
       <button class="btn btn-red" onclick="stopTimer()" style="flex:1">Stop Timer</button>
     </div>
   </div>
-
   <div class="admin-section">
-    <h2>Data Management</h2>
+    <h2>Data</h2>
     <button class="btn btn-red" onclick="resetScores()">Reset All Scores</button>
-    <button class="btn btn-red" onclick="clearEverything()">Clear Everything</button>
+    <button class="btn btn-red" onclick="resetAll()">Clear Everything</button>
   </div>
 </div>
 
@@ -202,8 +205,8 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     <h1 id="judgeTitle"></h1>
   </div>
   <div class="card" id="judgeRef"></div>
-  <h3 style="margin-top:16px">Tap a competitor to score:</h3>
-  <div id="judgeCompetitors"></div>
+  <h3 style="margin-top:16px">Tap a team to score:</h3>
+  <div id="judgeTeams"></div>
 </div>
 
 <!-- SCORING -->
@@ -226,7 +229,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
     <h1>Leaderboard</h1>
   </div>
-  <button class="btn btn-sm btn-orange" onclick="renderLeaderboard()" style="margin-bottom:16px;width:100%;text-align:center">Refresh</button>
+  <div id="lbStatus" class="status-bar"></div>
   <div id="leaderboardList"></div>
 </div>
 
@@ -244,6 +247,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
       <button class="btn btn-red btn-sm" onclick="stopTimer()">Stop</button>
     </div>
   </div>
+  <div id="markSection" class="mark-section" style="display:none">
+    <h2>Completion Times</h2>
+    <div id="markList"></div>
+  </div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -251,7 +258,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 <script>
 'use strict';
 
-// --- Categories ---
 var CATEGORIES = [
   { name: 'Safety', max: 25, criteria: [
     { label: 'Safety zone maintained', max: 10 },
@@ -280,128 +286,205 @@ var CATEGORIES = [
   ]}
 ];
 
-var MAX_TOTAL = 100;
+var TIME_MAX_POINTS = 15;
+var JUDGE_MAX = 100;
+var TOTAL_MAX = JUDGE_MAX + TIME_MAX_POINTS; // 115
+var POLL_MS = 3000;
 
-// --- Utility ---
-function esc(s) {
-  var d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
+// ---- State ----
+var S = { teams: [], scores: {}, timer: null, completionTimes: {} };
+var serverOffset = 0; // ms difference: serverTime*1000 - Date.now()
+var currentCatIdx = 0;
+var currentTeam = '';
+var activeScreen = 'home';
+var pollId = null;
+var tickId = null;
 
-function toast(msg) {
+// ---- Helpers ----
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function toast(msg, err) {
   var el = document.getElementById('toast');
   el.textContent = msg;
-  el.classList.add('show');
+  el.className = 'toast' + (err ? ' error' : '') + ' show';
   clearTimeout(toast._t);
   toast._t = setTimeout(function() { el.classList.remove('show'); }, 2200);
 }
 
-// --- Storage ---
-function getCompetitors() {
-  try { return JSON.parse(localStorage.getItem('fb_competitors')) || []; }
-  catch(e) { return []; }
+function fmtTime(sec) {
+  if (sec == null) return 'DNF';
+  var m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
 }
-function saveCompetitors(list) { localStorage.setItem('fb_competitors', JSON.stringify(list)); }
 
-function getScores() {
-  try { return JSON.parse(localStorage.getItem('fb_scores')) || {}; }
-  catch(e) { return {}; }
+function serverNow() { return Date.now() + serverOffset; }
+
+function calcTimeScore(elapsed, duration) {
+  if (elapsed == null || duration <= 0) return 0;
+  var s = TIME_MAX_POINTS * (duration - elapsed) / duration;
+  return Math.max(0, Math.round(s));
 }
-function saveScores(obj) { localStorage.setItem('fb_scores', JSON.stringify(obj)); }
 
-function getTimerState() {
-  try { return JSON.parse(localStorage.getItem('fb_timer')) || null; }
-  catch(e) { return null; }
+// ---- API ----
+function api(method, path, body) {
+  var opts = { method: method, headers: {} };
+  if (body !== undefined) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  return fetch(path, opts).then(function(r) {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  });
 }
-function saveTimerState(obj) { localStorage.setItem('fb_timer', JSON.stringify(obj)); }
 
-// --- Navigation ---
-var currentCatIdx = 0;
-var currentCompetitor = '';
+function refresh() {
+  return api('GET', '/api/data').then(function(data) {
+    serverOffset = Math.round(data.serverTime * 1000 - Date.now());
+    delete data.serverTime;
+    S = data;
+    return S;
+  }).catch(function() {
+    // silent fail on poll
+  });
+}
 
+// ---- Polling ----
+function startPoll() {
+  stopPoll();
+  pollId = setInterval(function() {
+    refresh().then(function() {
+      if (activeScreen === 'leaderboard') renderLeaderboard();
+      if (activeScreen === 'timer-view') renderMarkList();
+      if (activeScreen === 'judge') renderJudgeList();
+    });
+  }, POLL_MS);
+}
+function stopPoll() { clearInterval(pollId); pollId = null; }
+
+// ---- Timer tick ----
+function startTick() {
+  stopTick();
+  tickId = setInterval(renderTimerDisplay, 250);
+  renderTimerDisplay();
+}
+function stopTick() { clearInterval(tickId); tickId = null; }
+
+// ---- Navigation ----
 function showScreen(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
   document.getElementById(id).classList.add('active');
-  if (id === 'admin') renderAdmin();
-  if (id === 'leaderboard') renderLeaderboard();
-  if (id === 'timer-view') renderTimerView();
+  activeScreen = id;
+  stopPoll(); stopTick();
+
+  refresh().then(function() {
+    if (id === 'admin') renderAdmin();
+    if (id === 'leaderboard') { renderLeaderboard(); startPoll(); }
+    if (id === 'timer-view') { renderTimerFull(); startPoll(); startTick(); }
+    if (id === 'home') renderHome();
+  });
   window.scrollTo(0, 0);
 }
 
-// --- Admin ---
-function renderAdmin() {
-  var list = getCompetitors();
-  var el = document.getElementById('competitorList');
-  if (list.length === 0) {
-    el.innerHTML = '<div class="empty-state">No competitors added yet.</div>';
-    return;
-  }
-  var html = '';
-  for (var i = 0; i < list.length; i++) {
-    html += '<div class="competitor-item">' +
-      '<span class="name">' + esc(list[i]) + '</span>' +
-      '<button class="remove-btn" onclick="removeCompetitor(' + i + ')" title="Remove">&times;</button>' +
-    '</div>';
-  }
-  el.innerHTML = html;
+// ---- Home ----
+function renderHome() {
+  var t = S.teams.length;
+  var el = document.getElementById('homeStatus');
+  el.innerHTML = '<span class="status-dot live"></span>Live &middot; ' + t + ' team' + (t !== 1 ? 's' : '');
 }
 
-function addCompetitor() {
-  var input = document.getElementById('newName');
-  var name = input.value.trim();
+// ---- Admin ----
+function renderAdmin() {
+  var el = document.getElementById('teamList');
+  if (S.teams.length === 0) {
+    el.innerHTML = '<div class="empty-state">No teams added yet.</div>';
+    return;
+  }
+  var h = '';
+  for (var i = 0; i < S.teams.length; i++) {
+    h += '<div class="team-item">' +
+      '<span class="name">' + esc(S.teams[i]) + '</span>' +
+      '<button class="remove-btn" data-i="' + i + '" title="Remove">&times;</button>' +
+    '</div>';
+  }
+  el.innerHTML = h;
+  el.querySelectorAll('.remove-btn').forEach(function(btn) {
+    btn.onclick = function() { removeTeam(parseInt(this.dataset.i)); };
+  });
+}
+
+function addTeam() {
+  var inp = document.getElementById('newName');
+  var name = inp.value.trim();
   if (!name) return;
-  var list = getCompetitors();
-  for (var i = 0; i < list.length; i++) {
-    if (list[i].toLowerCase() === name.toLowerCase()) {
-      toast('Competitor already exists');
+  api('POST', '/api/teams/add', { name: name }).then(function() {
+    inp.value = '';
+    toast('Added ' + name);
+    return refresh();
+  }).then(renderAdmin).catch(function() { toast('Error adding team', true); });
+}
+
+function removeTeam(idx) {
+  var name = S.teams[idx];
+  if (!confirm('Remove "' + name + '"?\nThis deletes their scores too.')) return;
+  api('POST', '/api/teams/remove', { name: name }).then(function() {
+    toast('Removed ' + name);
+    return refresh();
+  }).then(renderAdmin).catch(function() { toast('Error', true); });
+}
+
+function startTimer() {
+  var min = parseInt(document.getElementById('timerMinutes').value);
+  if (isNaN(min) || min < 1) { toast('Invalid duration', true); return; }
+  if (S.timer && S.timer.running) {
+    var elapsed = (serverNow() / 1000) - S.timer.startTime;
+    if (elapsed < S.timer.duration) {
+      toast('Timer already running');
+      showScreen('timer-view');
       return;
     }
   }
-  list.push(name);
-  saveCompetitors(list);
-  input.value = '';
-  renderAdmin();
-  toast('Added ' + name);
+  api('POST', '/api/timer/start', { duration: min * 60 }).then(function() {
+    toast('Timer started');
+    return refresh();
+  }).then(function() {
+    showScreen('timer-view');
+  }).catch(function() { toast('Error', true); });
 }
 
-function removeCompetitor(idx) {
-  var list = getCompetitors();
-  var name = list[idx];
-  if (!confirm('Remove competitor "' + name + '"?\nThis will also delete their scores.')) return;
-  list.splice(idx, 1);
-  saveCompetitors(list);
-  var scores = getScores();
-  delete scores[name];
-  saveScores(scores);
-  renderAdmin();
-  toast('Removed ' + name);
+function stopTimer() {
+  if (!confirm('Stop the timer?')) return;
+  api('POST', '/api/timer/stop').then(function() {
+    toast('Timer stopped');
+    return refresh();
+  }).then(function() {
+    renderTimerFull();
+  }).catch(function() { toast('Error', true); });
 }
 
 function resetScores() {
-  if (!confirm('Reset ALL scores for every competitor?\nCompetitors will be kept.')) return;
-  saveScores({});
-  toast('All scores reset');
+  if (!confirm('Reset ALL scores and completion times?\nTeams will be kept.')) return;
+  api('POST', '/api/reset-scores').then(function() {
+    toast('Scores reset');
+    return refresh();
+  }).then(renderAdmin).catch(function() { toast('Error', true); });
 }
 
-function clearEverything() {
-  if (!confirm('Delete ALL competitors, scores, and timer?\nThis cannot be undone.')) return;
-  localStorage.removeItem('fb_competitors');
-  localStorage.removeItem('fb_scores');
-  localStorage.removeItem('fb_timer');
-  stopTimer();
-  renderAdmin();
-  toast('Everything cleared');
+function resetAll() {
+  if (!confirm('Delete ALL teams, scores, and timer?\nCannot be undone.')) return;
+  api('POST', '/api/reset-all').then(function() {
+    toast('Everything cleared');
+    return refresh();
+  }).then(renderAdmin).catch(function() { toast('Error', true); });
 }
 
-// --- Judge ---
+// ---- Judge ----
 function showJudge(catIdx) {
   currentCatIdx = catIdx;
   var cat = CATEGORIES[catIdx];
   document.getElementById('judgeTitle').textContent = cat.name + ' (' + cat.max + 'pts)';
 
-  // Reference table
   var ref = '<table class="ref-table"><tr><th>Criterion</th><th>Max</th></tr>';
   for (var i = 0; i < cat.criteria.length; i++) {
     ref += '<tr><td>' + esc(cat.criteria[i].label) + '</td><td>' + cat.criteria[i].max + '</td></tr>';
@@ -409,57 +492,49 @@ function showJudge(catIdx) {
   ref += '</table>';
   document.getElementById('judgeRef').innerHTML = ref;
 
-  renderJudgeList();
   showScreen('judge');
 }
 
 function renderJudgeList() {
-  var list = getCompetitors();
-  var scores = getScores();
   var cat = CATEGORIES[currentCatIdx];
-  var el = document.getElementById('judgeCompetitors');
-
-  if (list.length === 0) {
-    el.innerHTML = '<div class="empty-state">No competitors. Add them in Admin.</div>';
+  var el = document.getElementById('judgeTeams');
+  if (S.teams.length === 0) {
+    el.innerHTML = '<div class="empty-state">No teams. Add them in Admin.</div>';
     return;
   }
-
-  var html = '';
-  for (var i = 0; i < list.length; i++) {
-    var name = list[i];
-    var hasScore = scores[name] && scores[name][currentCatIdx] !== undefined;
-    var scoreTotal = 0;
-    if (hasScore) {
-      var vals = scores[name][currentCatIdx];
-      for (var j = 0; j < vals.length; j++) scoreTotal += (vals[j] || 0);
-    }
-    html += '<div class="competitor-item' + (hasScore ? ' scored' : '') + '" onclick="openScoring(\'' + esc(name).replace(/'/g, "\\'") + '\')">' +
+  var h = '';
+  for (var i = 0; i < S.teams.length; i++) {
+    var name = S.teams[i];
+    var sc = S.scores[name] && S.scores[name][currentCatIdx];
+    var total = 0;
+    if (sc) { for (var j = 0; j < sc.length; j++) total += (sc[j] || 0); }
+    var escapedName = esc(name).replace(/'/g, '&#39;');
+    h += '<div class="team-item' + (sc ? ' scored' : '') + '" onclick="openScoring(\'' + escapedName + '\')">' +
       '<span class="name">' + esc(name) + '</span>' +
-      (hasScore ? '<span class="badge">' + scoreTotal + '/' + cat.max + '</span>' : '') +
+      (sc ? '<span class="badge">' + total + '/' + cat.max + '</span>' : '') +
     '</div>';
   }
-  el.innerHTML = html;
+  el.innerHTML = h;
 }
 
-function backToJudge() {
-  renderJudgeList();
-  showScreen('judge');
-}
+function backToJudge() { showJudge(currentCatIdx); }
 
-// --- Scoring ---
+// ---- Scoring ----
 function openScoring(name) {
-  currentCompetitor = name;
+  // Decode HTML entities back
+  var tmp = document.createElement('textarea');
+  tmp.innerHTML = name;
+  currentTeam = tmp.value;
+
   var cat = CATEGORIES[currentCatIdx];
-  document.getElementById('scoringTitle').textContent = esc(name);
+  document.getElementById('scoringTitle').textContent = currentTeam;
 
-  var scores = getScores();
-  var existing = (scores[name] && scores[name][currentCatIdx]) || [];
-
-  var html = '<h2>' + esc(cat.name) + '</h2>';
+  var existing = (S.scores[currentTeam] && S.scores[currentTeam][currentCatIdx]) || [];
+  var h = '<h2>' + esc(cat.name) + '</h2>';
   for (var i = 0; i < cat.criteria.length; i++) {
     var c = cat.criteria[i];
     var val = existing[i] !== undefined ? existing[i] : '';
-    html += '<div class="criterion-row">' +
+    h += '<div class="criterion-row">' +
       '<label>' + esc(c.label) + '</label>' +
       '<span class="max">/ ' + c.max + '</span>' +
       '<input type="number" min="0" max="' + c.max + '" value="' + val + '" ' +
@@ -467,28 +542,32 @@ function openScoring(name) {
         'oninput="clampAndSum(this)" inputmode="numeric">' +
     '</div>';
   }
-  document.getElementById('scoringCriteria').innerHTML = html;
+  document.getElementById('scoringCriteria').innerHTML = h;
   updateScoringTotal();
-  showScreen('scoring');
+
+  var screens = document.querySelectorAll('.screen');
+  for (var j = 0; j < screens.length; j++) screens[j].classList.remove('active');
+  document.getElementById('scoring').classList.add('active');
+  activeScreen = 'scoring';
+  window.scrollTo(0, 0);
 }
 
 function clampAndSum(input) {
   var max = parseInt(input.getAttribute('data-max'));
   var val = parseInt(input.value);
-  if (val > max) { input.value = max; }
-  if (val < 0) { input.value = 0; }
+  if (val > max) input.value = max;
+  if (val < 0) input.value = 0;
   updateScoringTotal();
 }
 
 function updateScoringTotal() {
   var inputs = document.querySelectorAll('.score-input');
   var total = 0;
-  var catMax = CATEGORIES[currentCatIdx].max;
   for (var i = 0; i < inputs.length; i++) {
     var v = parseInt(inputs[i].value);
     if (!isNaN(v)) total += v;
   }
-  document.getElementById('scoringTotal').textContent = total + ' / ' + catMax;
+  document.getElementById('scoringTotal').textContent = total + ' / ' + CATEGORIES[currentCatIdx].max;
 }
 
 function submitScore() {
@@ -498,133 +577,98 @@ function submitScore() {
     var v = parseInt(inputs[i].value);
     vals.push(isNaN(v) ? 0 : v);
   }
-
-  var scores = getScores();
-  if (!scores[currentCompetitor]) scores[currentCompetitor] = {};
-  scores[currentCompetitor][currentCatIdx] = vals;
-  saveScores(scores);
-
-  toast('Score saved for ' + currentCompetitor);
-  backToJudge();
+  api('POST', '/api/scores', {
+    name: currentTeam, category: currentCatIdx, values: vals
+  }).then(function() {
+    toast('Score saved for ' + currentTeam);
+    return refresh();
+  }).then(function() {
+    backToJudge();
+  }).catch(function() { toast('Error saving', true); });
 }
 
-// --- Leaderboard ---
+// ---- Leaderboard ----
 function renderLeaderboard() {
-  var list = getCompetitors();
-  var scores = getScores();
   var el = document.getElementById('leaderboardList');
+  var st = document.getElementById('lbStatus');
+  st.innerHTML = '<span class="status-dot live"></span>Auto-refreshing';
 
-  if (list.length === 0) {
-    el.innerHTML = '<div class="empty-state">No competitors yet.</div>';
+  if (S.teams.length === 0) {
+    el.innerHTML = '<div class="empty-state">No teams yet.</div>';
     return;
   }
 
+  var dur = S.timer ? S.timer.duration : 0;
   var entries = [];
-  for (var i = 0; i < list.length; i++) {
-    var name = list[i];
-    var total = 0;
+  for (var i = 0; i < S.teams.length; i++) {
+    var name = S.teams[i];
+    var judgeTotal = 0;
     var catScores = [];
     for (var c = 0; c < CATEGORIES.length; c++) {
-      var catTotal = 0;
-      if (scores[name] && scores[name][c]) {
-        var vals = scores[name][c];
-        for (var j = 0; j < vals.length; j++) catTotal += (vals[j] || 0);
+      var ct = 0;
+      if (S.scores[name] && S.scores[name][c]) {
+        var v = S.scores[name][c];
+        for (var j = 0; j < v.length; j++) ct += (v[j] || 0);
       }
-      catScores.push(catTotal);
-      total += catTotal;
+      catScores.push(ct);
+      judgeTotal += ct;
     }
-    entries.push({ name: name, total: total, cats: catScores });
+    var elapsed = S.completionTimes[name];
+    var timePts = calcTimeScore(elapsed, dur);
+    var total = judgeTotal + timePts;
+    entries.push({ name: name, total: total, cats: catScores, timePts: timePts, elapsed: elapsed });
   }
 
   entries.sort(function(a, b) { return b.total - a.total; });
 
-  var html = '';
+  var h = '';
   for (var i = 0; i < entries.length; i++) {
     var e = entries[i];
-    var pct = MAX_TOTAL > 0 ? Math.round((e.total / MAX_TOTAL) * 100) : 0;
-    var rankClass = i === 0 ? ' r1' : i === 1 ? ' r2' : i === 2 ? ' r3' : '';
-    html += '<div class="lb-item">' +
-      '<div class="lb-rank' + rankClass + '">' + (i + 1) + '</div>' +
+    var pct = TOTAL_MAX > 0 ? Math.round((e.total / TOTAL_MAX) * 100) : 0;
+    var rc = i === 0 ? ' r1' : i === 1 ? ' r2' : i === 2 ? ' r3' : '';
+    h += '<div class="lb-item">' +
+      '<div class="lb-rank' + rc + '">' + (i + 1) + '</div>' +
       '<div class="lb-info">' +
         '<div class="lb-name">' + esc(e.name) + '</div>' +
-        '<div class="lb-score">' + e.total + ' / ' + MAX_TOTAL + ' pts</div>' +
+        '<div class="lb-score">' + e.total + ' / ' + TOTAL_MAX + ' pts</div>' +
         '<div class="lb-bar-bg"><div class="lb-bar-fill" style="width:' + pct + '%"></div></div>' +
         '<div class="lb-cats">';
     for (var c = 0; c < CATEGORIES.length; c++) {
-      html += '<span class="lb-cat">' + esc(CATEGORIES[c].name) + ': ' + e.cats[c] + '/' + CATEGORIES[c].max + '</span>';
+      h += '<span class="lb-cat">' + CATEGORIES[c].name + ': ' + e.cats[c] + '</span>';
     }
-    html += '</div></div></div>';
+    var timeLabel = e.elapsed != null ? fmtTime(e.elapsed) : 'DNF';
+    h += '<span class="lb-cat time-cat">Time: ' + e.timePts + '/' + TIME_MAX_POINTS + ' (' + timeLabel + ')</span>';
+    h += '</div></div></div>';
   }
-  el.innerHTML = html;
+  el.innerHTML = h;
 }
 
-// --- Timer ---
-var timerInterval = null;
-
-function startTimer() {
-  var minInput = document.getElementById('timerMinutes');
-  var state = getTimerState();
-  var totalSec;
-
-  if (state && state.running && state.endTime > Date.now()) {
-    // already running
-    toast('Timer already running');
-    showScreen('timer-view');
-    return;
-  }
-
-  totalSec = parseInt(minInput.value) * 60;
-  if (isNaN(totalSec) || totalSec < 1) { toast('Invalid duration'); return; }
-
-  var endTime = Date.now() + totalSec * 1000;
-  saveTimerState({ running: true, endTime: endTime, duration: totalSec });
-  tickTimer();
-  toast('Timer started');
-  showScreen('timer-view');
+// ---- Timer ----
+function renderTimerFull() {
+  renderTimerDisplay();
+  renderMarkList();
 }
 
-function stopTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  saveTimerState(null);
+function renderTimerDisplay() {
   var display = document.getElementById('timerDisplay');
   var label = document.getElementById('timerLabel');
-  if (display) { display.textContent = '--:--'; display.className = 'timer-time'; }
-  if (label) label.textContent = 'Ready';
-  toast('Timer stopped');
-}
+  var t = S.timer;
 
-function tickTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(updateTimerDisplay, 250);
-  updateTimerDisplay();
-}
-
-function updateTimerDisplay() {
-  var state = getTimerState();
-  var display = document.getElementById('timerDisplay');
-  var label = document.getElementById('timerLabel');
-  if (!display) return;
-
-  if (!state || !state.running) {
+  if (!t || !t.running) {
     display.textContent = '--:--';
     display.className = 'timer-time';
     label.textContent = 'Ready';
-    clearInterval(timerInterval);
     return;
   }
 
-  var remaining = Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
-  var min = Math.floor(remaining / 60);
-  var sec = remaining % 60;
-  display.textContent = (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+  var elapsed = (serverNow() / 1000) - t.startTime;
+  var remaining = Math.max(0, Math.ceil(t.duration - elapsed));
+  display.textContent = fmtTime(remaining);
 
   if (remaining <= 0) {
     display.textContent = "TIME'S UP";
     display.className = 'timer-time done';
     label.textContent = '';
-    clearInterval(timerInterval);
-    saveTimerState({ running: false, endTime: state.endTime, duration: state.duration });
   } else if (remaining <= 60) {
     display.className = 'timer-time urgent';
     label.textContent = 'FINAL MINUTE';
@@ -634,28 +678,82 @@ function updateTimerDisplay() {
   }
 }
 
-function renderTimerView() {
-  var state = getTimerState();
-  if (state && state.running && state.endTime > Date.now()) {
-    tickTimer();
-  } else if (state && !state.running) {
-    var display = document.getElementById('timerDisplay');
-    var label = document.getElementById('timerLabel');
-    display.textContent = "TIME'S UP";
-    display.className = 'timer-time done';
-    label.textContent = '';
-  } else {
-    updateTimerDisplay();
+function renderMarkList() {
+  var section = document.getElementById('markSection');
+  var el = document.getElementById('markList');
+  var t = S.timer;
+
+  if (!t || S.teams.length === 0) {
+    section.style.display = 'none';
+    return;
   }
+
+  section.style.display = 'block';
+  var dur = t.duration;
+  var timerDone = !t.running || ((serverNow() / 1000) - t.startTime >= dur);
+  var h = '';
+
+  for (var i = 0; i < S.teams.length; i++) {
+    var name = S.teams[i];
+    var elapsed = S.completionTimes[name];
+    var done = elapsed != null;
+    var pts = calcTimeScore(elapsed, dur);
+    var escapedName = esc(name).replace(/"/g, '&quot;');
+
+    h += '<div class="mark-item' + (done ? ' marked' : '') + '">';
+    h += '<span class="name">' + esc(name) + '</span>';
+
+    if (done) {
+      h += '<span class="mark-pts">' + pts + '/' + TIME_MAX_POINTS + ' pts</span>';
+      h += '<span class="mark-time">' + fmtTime(elapsed) + '</span>';
+      h += '<button class="undo-btn" onclick="unmarkTime(\'' + escapedName + '\')">Undo</button>';
+    } else if (!timerDone) {
+      h += '<button class="mark-btn" onclick="markTime(\'' + escapedName + '\')">Mark Time</button>';
+    } else {
+      h += '<span class="mark-time" style="color:var(--red)">DNF</span>';
+      h += '<span class="mark-pts">0/' + TIME_MAX_POINTS + '</span>';
+    }
+    h += '</div>';
+  }
+  el.innerHTML = h;
 }
 
-// Resume timer on page load
-(function() {
-  var state = getTimerState();
-  if (state && state.running && state.endTime > Date.now()) {
-    tickTimer();
-  }
-})();
+function markTime(name) {
+  // Decode
+  var tmp = document.createElement('textarea');
+  tmp.innerHTML = name;
+  var decoded = tmp.value;
+
+  var t = S.timer;
+  if (!t || !t.running) return;
+  var elapsed = (serverNow() / 1000) - t.startTime;
+  if (!confirm('Mark ' + decoded + ' at ' + fmtTime(elapsed) + '?')) return;
+
+  api('POST', '/api/mark-time', { name: decoded }).then(function() {
+    toast(decoded + ' marked!');
+    return refresh();
+  }).then(renderMarkList).catch(function() { toast('Error', true); });
+}
+
+function unmarkTime(name) {
+  var tmp = document.createElement('textarea');
+  tmp.innerHTML = name;
+  var decoded = tmp.value;
+  if (!confirm('Undo time for ' + decoded + '?')) return;
+
+  api('POST', '/api/unmark-time', { name: decoded }).then(function() {
+    toast('Time cleared for ' + decoded);
+    return refresh();
+  }).then(renderMarkList).catch(function() { toast('Error', true); });
+}
+
+// ---- Init ----
+refresh().then(function() {
+  renderHome();
+}).catch(function() {
+  document.getElementById('homeStatus').innerHTML =
+    '<span class="status-dot off"></span>Cannot connect to server';
+});
 </script>
 </body>
 </html>
