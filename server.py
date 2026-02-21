@@ -75,23 +75,29 @@ class Handler(BaseHTTPRequestHandler):
                 data['scores'][name][cat] = vals
 
             elif path == '/api/timer/start':
-                dur = int(body.get('duration', 600))
                 data['timer'] = {
                     'startTime': time.time(),
-                    'duration': dur,
                     'running': True
                 }
                 data['completionTimes'] = {}
 
             elif path == '/api/timer/stop':
+                if data.get('timer') and data['timer'].get('running'):
+                    data['timer']['running'] = False
+                    data['timer']['stoppedAt'] = time.time()
+                else:
+                    data['timer'] = None
+
+            elif path == '/api/timer/reset':
                 data['timer'] = None
+                data['completionTimes'] = {}
 
             elif path == '/api/mark-time':
                 name = body.get('name', '')
                 t = data.get('timer')
-                if t and t.get('running') and name in data['teams']:
+                if t and t.get('startTime') and name in data['teams']:
                     elapsed = time.time() - t['startTime']
-                    if elapsed <= t['duration'] and name not in data.get('completionTimes', {}):
+                    if name not in data.get('completionTimes', {}):
                         data['completionTimes'][name] = round(elapsed, 1)
 
             elif path == '/api/unmark-time':

@@ -49,7 +49,7 @@ h3 { font-size: 1rem; color: var(--text-dim); margin-bottom: 8px; }
 
 .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
 
-input[type="text"], input[type="number"], select {
+input[type="text"], input[type="number"] {
   width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius);
   background: var(--bg-input); color: var(--text); font-size: 1rem;
 }
@@ -67,8 +67,8 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 .team-item.scored { background: var(--green-dim); border-color: var(--green); }
 .team-item .name { flex: 1; font-size: 1rem; }
-.team-item .badge { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: var(--green); color: #fff; }
-.team-item .remove-btn { color: var(--red); font-size: 1.2rem; padding: 4px 8px; cursor: pointer; background: none; border: none; }
+.team-item .badge { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: var(--green); color: #fff; margin-left: 8px; }
+.team-item .remove-btn { color: var(--red); font-size: 1.4rem; padding: 4px 10px; cursor: pointer; background: none; border: none; line-height: 1; }
 
 .criterion-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .criterion-row label { flex: 1; font-size: 0.95rem; line-height: 1.3; }
@@ -94,13 +94,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
 .timer-display { text-align: center; padding: 20px 16px; }
 .timer-time { font-size: 5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--amber); line-height: 1; margin-bottom: 16px; }
-.timer-time.urgent { color: var(--red); animation: pulse 1s infinite; }
-.timer-time.done { color: var(--red); }
 .timer-label { font-size: 1.5rem; color: var(--text-dim); margin-bottom: 20px; }
 .timer-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
 .timer-controls .btn { width: auto; min-width: 120px; text-align: center; }
-
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
 .mark-section { border-top: 1px solid var(--border); padding-top: 16px; }
 .mark-item {
@@ -133,17 +129,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .ref-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .ref-table td:last-child { text-align: right; color: var(--text-dim); white-space: nowrap; }
 
-.timer-config { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; justify-content: center; }
-.timer-config label { color: var(--text-dim); }
-.timer-config input { width: 80px; }
-
 .admin-section { margin-bottom: 24px; }
 .admin-section h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 .empty-state { text-align: center; color: var(--text-dim); padding: 40px 16px; font-size: 1rem; }
-.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.status-bar { text-align: center; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 12px; }
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
 .status-dot.live { background: var(--green); }
 .status-dot.off { background: var(--red); }
-.status-bar { text-align: center; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 12px; }
 </style>
 </head>
 <body>
@@ -154,7 +146,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
   <div id="homeStatus" class="status-bar"></div>
   <div class="nav-grid">
     <button class="btn" onclick="showScreen('admin')"><span class="nav-emoji">&#9881;</span>Admin</button>
-    <button class="btn" onclick="showScreen('timer-view')"><span class="nav-emoji">&#9201;</span>Timer</button>
+    <button class="btn" onclick="showScreen('timer-view')"><span class="nav-emoji">&#9201;</span>Stopwatch</button>
     <button class="btn" onclick="showJudge(0)"><span class="nav-emoji">&#128737;</span>Safety</button>
     <button class="btn" onclick="showJudge(1)"><span class="nav-emoji">&#128293;</span>Fire Lay</button>
     <button class="btn" onclick="showJudge(2)"><span class="nav-emoji">&#128736;</span>Technique</button>
@@ -180,15 +172,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     <div id="teamList"></div>
   </div>
   <div class="admin-section">
-    <h2>Timer</h2>
-    <div class="timer-config">
-      <label>Duration:</label>
-      <input type="number" id="timerMinutes" min="1" max="120" value="10">
-      <label>min</label>
-    </div>
+    <h2>Stopwatch</h2>
     <div style="display:flex;gap:10px">
-      <button class="btn btn-green" onclick="startTimer()" style="flex:1">Start Timer</button>
-      <button class="btn btn-red" onclick="stopTimer()" style="flex:1">Stop Timer</button>
+      <button class="btn btn-green" onclick="startTimer()" style="flex:1">Start</button>
+      <button class="btn btn-red" onclick="stopTimer()" style="flex:1">Stop</button>
+      <button class="btn" onclick="resetTimer()" style="flex:1">Reset</button>
     </div>
   </div>
   <div class="admin-section">
@@ -237,14 +225,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 <div id="timer-view" class="screen">
   <div class="back-bar">
     <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
-    <h1>Timer</h1>
+    <h1>Stopwatch</h1>
   </div>
   <div class="timer-display">
     <div id="timerLabel" class="timer-label">Ready</div>
-    <div id="timerDisplay" class="timer-time">--:--</div>
+    <div id="timerDisplay" class="timer-time">00:00</div>
     <div class="timer-controls">
       <button class="btn btn-green btn-sm" onclick="startTimer()">Start</button>
       <button class="btn btn-red btn-sm" onclick="stopTimer()">Stop</button>
+      <button class="btn btn-sm" onclick="resetTimer()">Reset</button>
     </div>
   </div>
   <div id="markSection" class="mark-section" style="display:none">
@@ -288,12 +277,12 @@ var CATEGORIES = [
 
 var TIME_MAX_POINTS = 15;
 var JUDGE_MAX = 100;
-var TOTAL_MAX = JUDGE_MAX + TIME_MAX_POINTS; // 115
+var TOTAL_MAX = JUDGE_MAX + TIME_MAX_POINTS;
 var POLL_MS = 3000;
 
 // ---- State ----
 var S = { teams: [], scores: {}, timer: null, completionTimes: {} };
-var serverOffset = 0; // ms difference: serverTime*1000 - Date.now()
+var serverOffset = 0;
 var currentCatIdx = 0;
 var currentTeam = '';
 var activeScreen = 'home';
@@ -319,10 +308,22 @@ function fmtTime(sec) {
 
 function serverNow() { return Date.now() + serverOffset; }
 
-function calcTimeScore(elapsed, duration) {
-  if (elapsed == null || duration <= 0) return 0;
-  var s = TIME_MAX_POINTS * (duration - elapsed) / duration;
-  return Math.max(0, Math.round(s));
+// Rank-based time scoring: fastest team gets TIME_MAX_POINTS,
+// others get proportionally less based on (fastest / their_time)
+function calcAllTimeScores() {
+  var ct = S.completionTimes || {};
+  var times = [];
+  for (var name in ct) {
+    if (ct[name] != null) times.push({ name: name, time: ct[name] });
+  }
+  var result = {};
+  if (times.length === 0) return result;
+  times.sort(function(a, b) { return a.time - b.time; });
+  var fastest = times[0].time;
+  for (var i = 0; i < times.length; i++) {
+    result[times[i].name] = Math.round(TIME_MAX_POINTS * fastest / times[i].time);
+  }
+  return result;
 }
 
 // ---- API ----
@@ -344,12 +345,10 @@ function refresh() {
     delete data.serverTime;
     S = data;
     return S;
-  }).catch(function() {
-    // silent fail on poll
   });
 }
 
-// ---- Polling ----
+// ---- Polling & Tick ----
 function startPoll() {
   stopPoll();
   pollId = setInterval(function() {
@@ -357,17 +356,11 @@ function startPoll() {
       if (activeScreen === 'leaderboard') renderLeaderboard();
       if (activeScreen === 'timer-view') renderMarkList();
       if (activeScreen === 'judge') renderJudgeList();
-    });
+    }).catch(function() {});
   }, POLL_MS);
 }
 function stopPoll() { clearInterval(pollId); pollId = null; }
-
-// ---- Timer tick ----
-function startTick() {
-  stopTick();
-  tickId = setInterval(renderTimerDisplay, 250);
-  renderTimerDisplay();
-}
+function startTick() { stopTick(); tickId = setInterval(renderTimerDisplay, 250); renderTimerDisplay(); }
 function stopTick() { clearInterval(tickId); tickId = null; }
 
 // ---- Navigation ----
@@ -380,18 +373,19 @@ function showScreen(id) {
 
   refresh().then(function() {
     if (id === 'admin') renderAdmin();
+    if (id === 'judge') renderJudgeList();
     if (id === 'leaderboard') { renderLeaderboard(); startPoll(); }
     if (id === 'timer-view') { renderTimerFull(); startPoll(); startTick(); }
     if (id === 'home') renderHome();
-  });
+  }).catch(function() {});
   window.scrollTo(0, 0);
 }
 
 // ---- Home ----
 function renderHome() {
   var t = S.teams.length;
-  var el = document.getElementById('homeStatus');
-  el.innerHTML = '<span class="status-dot live"></span>Live &middot; ' + t + ' team' + (t !== 1 ? 's' : '');
+  document.getElementById('homeStatus').innerHTML =
+    '<span class="status-dot live"></span>Live &middot; ' + t + ' team' + (t !== 1 ? 's' : '');
 }
 
 // ---- Admin ----
@@ -403,14 +397,17 @@ function renderAdmin() {
   }
   var h = '';
   for (var i = 0; i < S.teams.length; i++) {
-    h += '<div class="team-item">' +
+    h += '<div class="team-item" data-idx="' + i + '">' +
       '<span class="name">' + esc(S.teams[i]) + '</span>' +
-      '<button class="remove-btn" data-i="' + i + '" title="Remove">&times;</button>' +
+      '<button class="remove-btn" data-idx="' + i + '" title="Remove">&times;</button>' +
     '</div>';
   }
   el.innerHTML = h;
   el.querySelectorAll('.remove-btn').forEach(function(btn) {
-    btn.onclick = function() { removeTeam(parseInt(this.dataset.i)); };
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      removeTeam(parseInt(this.dataset.idx));
+    });
   });
 }
 
@@ -435,28 +432,35 @@ function removeTeam(idx) {
 }
 
 function startTimer() {
-  var min = parseInt(document.getElementById('timerMinutes').value);
-  if (isNaN(min) || min < 1) { toast('Invalid duration', true); return; }
   if (S.timer && S.timer.running) {
-    var elapsed = (serverNow() / 1000) - S.timer.startTime;
-    if (elapsed < S.timer.duration) {
-      toast('Timer already running');
-      showScreen('timer-view');
-      return;
-    }
+    toast('Stopwatch already running');
+    if (activeScreen !== 'timer-view') showScreen('timer-view');
+    return;
   }
-  api('POST', '/api/timer/start', { duration: min * 60 }).then(function() {
-    toast('Timer started');
+  api('POST', '/api/timer/start').then(function() {
+    toast('Stopwatch started');
     return refresh();
   }).then(function() {
-    showScreen('timer-view');
+    if (activeScreen !== 'timer-view') showScreen('timer-view');
+    else { renderTimerFull(); startTick(); }
   }).catch(function() { toast('Error', true); });
 }
 
 function stopTimer() {
-  if (!confirm('Stop the timer?')) return;
+  if (!S.timer || !S.timer.running) { toast('Not running'); return; }
+  if (!confirm('Stop the stopwatch?')) return;
   api('POST', '/api/timer/stop').then(function() {
-    toast('Timer stopped');
+    toast('Stopwatch stopped');
+    return refresh();
+  }).then(function() {
+    renderTimerFull();
+  }).catch(function() { toast('Error', true); });
+}
+
+function resetTimer() {
+  if (!confirm('Reset stopwatch and all completion times?')) return;
+  api('POST', '/api/timer/reset').then(function() {
+    toast('Stopwatch reset');
     return refresh();
   }).then(function() {
     renderTimerFull();
@@ -472,7 +476,7 @@ function resetScores() {
 }
 
 function resetAll() {
-  if (!confirm('Delete ALL teams, scores, and timer?\nCannot be undone.')) return;
+  if (!confirm('Delete ALL teams, scores, and stopwatch?\nCannot be undone.')) return;
   api('POST', '/api/reset-all').then(function() {
     toast('Everything cleared');
     return refresh();
@@ -508,29 +512,31 @@ function renderJudgeList() {
     var sc = S.scores[name] && S.scores[name][currentCatIdx];
     var total = 0;
     if (sc) { for (var j = 0; j < sc.length; j++) total += (sc[j] || 0); }
-    var escapedName = esc(name).replace(/'/g, '&#39;');
-    h += '<div class="team-item' + (sc ? ' scored' : '') + '" onclick="openScoring(\'' + escapedName + '\')">' +
+    h += '<div class="team-item' + (sc ? ' scored' : '') + '" data-team="' + i + '">' +
       '<span class="name">' + esc(name) + '</span>' +
       (sc ? '<span class="badge">' + total + '/' + cat.max + '</span>' : '') +
     '</div>';
   }
   el.innerHTML = h;
+  // Wire up click handlers via data attribute (safe for any team name)
+  el.querySelectorAll('.team-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.team);
+      openScoring(S.teams[idx]);
+    });
+  });
 }
 
 function backToJudge() { showJudge(currentCatIdx); }
 
 // ---- Scoring ----
 function openScoring(name) {
-  // Decode HTML entities back
-  var tmp = document.createElement('textarea');
-  tmp.innerHTML = name;
-  currentTeam = tmp.value;
-
+  currentTeam = name;
   var cat = CATEGORIES[currentCatIdx];
-  document.getElementById('scoringTitle').textContent = currentTeam;
+  document.getElementById('scoringTitle').textContent = name + ' \u2014 ' + cat.name;
 
-  var existing = (S.scores[currentTeam] && S.scores[currentTeam][currentCatIdx]) || [];
-  var h = '<h2>' + esc(cat.name) + '</h2>';
+  var existing = (S.scores[name] && S.scores[name][currentCatIdx]) || [];
+  var h = '';
   for (var i = 0; i < cat.criteria.length; i++) {
     var c = cat.criteria[i];
     var val = existing[i] !== undefined ? existing[i] : '';
@@ -545,6 +551,7 @@ function openScoring(name) {
   document.getElementById('scoringCriteria').innerHTML = h;
   updateScoringTotal();
 
+  // Switch to scoring screen directly (don't go through showScreen to avoid re-fetch)
   var screens = document.querySelectorAll('.screen');
   for (var j = 0; j < screens.length; j++) screens[j].classList.remove('active');
   document.getElementById('scoring').classList.add('active');
@@ -590,20 +597,19 @@ function submitScore() {
 // ---- Leaderboard ----
 function renderLeaderboard() {
   var el = document.getElementById('leaderboardList');
-  var st = document.getElementById('lbStatus');
-  st.innerHTML = '<span class="status-dot live"></span>Auto-refreshing';
+  document.getElementById('lbStatus').innerHTML =
+    '<span class="status-dot live"></span>Auto-refreshing every ' + (POLL_MS / 1000) + 's';
 
   if (S.teams.length === 0) {
     el.innerHTML = '<div class="empty-state">No teams yet.</div>';
     return;
   }
 
-  var dur = S.timer ? S.timer.duration : 0;
+  var timeScores = calcAllTimeScores();
   var entries = [];
   for (var i = 0; i < S.teams.length; i++) {
     var name = S.teams[i];
-    var judgeTotal = 0;
-    var catScores = [];
+    var judgeTotal = 0, catScores = [];
     for (var c = 0; c < CATEGORIES.length; c++) {
       var ct = 0;
       if (S.scores[name] && S.scores[name][c]) {
@@ -613,10 +619,9 @@ function renderLeaderboard() {
       catScores.push(ct);
       judgeTotal += ct;
     }
-    var elapsed = S.completionTimes[name];
-    var timePts = calcTimeScore(elapsed, dur);
-    var total = judgeTotal + timePts;
-    entries.push({ name: name, total: total, cats: catScores, timePts: timePts, elapsed: elapsed });
+    var timePts = timeScores[name] || 0;
+    var elapsed = (S.completionTimes || {})[name];
+    entries.push({ name: name, total: judgeTotal + timePts, cats: catScores, timePts: timePts, elapsed: elapsed });
   }
 
   entries.sort(function(a, b) { return b.total - a.total; });
@@ -626,6 +631,7 @@ function renderLeaderboard() {
     var e = entries[i];
     var pct = TOTAL_MAX > 0 ? Math.round((e.total / TOTAL_MAX) * 100) : 0;
     var rc = i === 0 ? ' r1' : i === 1 ? ' r2' : i === 2 ? ' r3' : '';
+    var timeLabel = e.elapsed != null ? fmtTime(e.elapsed) : 'DNF';
     h += '<div class="lb-item">' +
       '<div class="lb-rank' + rc + '">' + (i + 1) + '</div>' +
       '<div class="lb-info">' +
@@ -636,46 +642,37 @@ function renderLeaderboard() {
     for (var c = 0; c < CATEGORIES.length; c++) {
       h += '<span class="lb-cat">' + CATEGORIES[c].name + ': ' + e.cats[c] + '</span>';
     }
-    var timeLabel = e.elapsed != null ? fmtTime(e.elapsed) : 'DNF';
     h += '<span class="lb-cat time-cat">Time: ' + e.timePts + '/' + TIME_MAX_POINTS + ' (' + timeLabel + ')</span>';
     h += '</div></div></div>';
   }
   el.innerHTML = h;
 }
 
-// ---- Timer ----
-function renderTimerFull() {
-  renderTimerDisplay();
-  renderMarkList();
-}
+// ---- Timer / Stopwatch ----
+function renderTimerFull() { renderTimerDisplay(); renderMarkList(); }
 
 function renderTimerDisplay() {
   var display = document.getElementById('timerDisplay');
   var label = document.getElementById('timerLabel');
   var t = S.timer;
 
-  if (!t || !t.running) {
-    display.textContent = '--:--';
+  if (!t) {
+    display.textContent = '00:00';
     display.className = 'timer-time';
     label.textContent = 'Ready';
     return;
   }
 
-  var elapsed = (serverNow() / 1000) - t.startTime;
-  var remaining = Math.max(0, Math.ceil(t.duration - elapsed));
-  display.textContent = fmtTime(remaining);
-
-  if (remaining <= 0) {
-    display.textContent = "TIME'S UP";
-    display.className = 'timer-time done';
-    label.textContent = '';
-  } else if (remaining <= 60) {
-    display.className = 'timer-time urgent';
-    label.textContent = 'FINAL MINUTE';
+  var elapsed;
+  if (t.running) {
+    elapsed = (serverNow() / 1000) - t.startTime;
   } else {
-    display.className = 'timer-time';
-    label.textContent = 'Time Remaining';
+    elapsed = (t.stoppedAt || t.startTime) - t.startTime;
   }
+  elapsed = Math.max(0, elapsed);
+  display.textContent = fmtTime(elapsed);
+  display.className = 'timer-time';
+  label.textContent = t.running ? 'Running' : 'Stopped at';
 }
 
 function renderMarkList() {
@@ -689,16 +686,14 @@ function renderMarkList() {
   }
 
   section.style.display = 'block';
-  var dur = t.duration;
-  var timerDone = !t.running || ((serverNow() / 1000) - t.startTime >= dur);
+  var timeScores = calcAllTimeScores();
   var h = '';
 
   for (var i = 0; i < S.teams.length; i++) {
     var name = S.teams[i];
-    var elapsed = S.completionTimes[name];
+    var elapsed = (S.completionTimes || {})[name];
     var done = elapsed != null;
-    var pts = calcTimeScore(elapsed, dur);
-    var escapedName = esc(name).replace(/"/g, '&quot;');
+    var pts = timeScores[name] || 0;
 
     h += '<div class="mark-item' + (done ? ' marked' : '') + '">';
     h += '<span class="name">' + esc(name) + '</span>';
@@ -706,9 +701,9 @@ function renderMarkList() {
     if (done) {
       h += '<span class="mark-pts">' + pts + '/' + TIME_MAX_POINTS + ' pts</span>';
       h += '<span class="mark-time">' + fmtTime(elapsed) + '</span>';
-      h += '<button class="undo-btn" onclick="unmarkTime(\'' + escapedName + '\')">Undo</button>';
-    } else if (!timerDone) {
-      h += '<button class="mark-btn" onclick="markTime(\'' + escapedName + '\')">Mark Time</button>';
+      h += '<button class="undo-btn" data-team="' + i + '">Undo</button>';
+    } else if (t.running) {
+      h += '<button class="mark-btn" data-team="' + i + '">Mark Time</button>';
     } else {
       h += '<span class="mark-time" style="color:var(--red)">DNF</span>';
       h += '<span class="mark-pts">0/' + TIME_MAX_POINTS + '</span>';
@@ -716,33 +711,38 @@ function renderMarkList() {
     h += '</div>';
   }
   el.innerHTML = h;
+
+  // Wire up mark/undo buttons via data attributes
+  el.querySelectorAll('.mark-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.team);
+      markTime(S.teams[idx]);
+    });
+  });
+  el.querySelectorAll('.undo-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var idx = parseInt(this.dataset.team);
+      unmarkTime(S.teams[idx]);
+    });
+  });
 }
 
 function markTime(name) {
-  // Decode
-  var tmp = document.createElement('textarea');
-  tmp.innerHTML = name;
-  var decoded = tmp.value;
-
   var t = S.timer;
   if (!t || !t.running) return;
   var elapsed = (serverNow() / 1000) - t.startTime;
-  if (!confirm('Mark ' + decoded + ' at ' + fmtTime(elapsed) + '?')) return;
+  if (!confirm('Mark ' + name + ' at ' + fmtTime(elapsed) + '?')) return;
 
-  api('POST', '/api/mark-time', { name: decoded }).then(function() {
-    toast(decoded + ' marked!');
+  api('POST', '/api/mark-time', { name: name }).then(function() {
+    toast(name + ' marked!');
     return refresh();
   }).then(renderMarkList).catch(function() { toast('Error', true); });
 }
 
 function unmarkTime(name) {
-  var tmp = document.createElement('textarea');
-  tmp.innerHTML = name;
-  var decoded = tmp.value;
-  if (!confirm('Undo time for ' + decoded + '?')) return;
-
-  api('POST', '/api/unmark-time', { name: decoded }).then(function() {
-    toast('Time cleared for ' + decoded);
+  if (!confirm('Undo time for ' + name + '?')) return;
+  api('POST', '/api/unmark-time', { name: name }).then(function() {
+    toast('Time cleared for ' + name);
     return refresh();
   }).then(renderMarkList).catch(function() { toast('Error', true); });
 }
