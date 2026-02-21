@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Scout Firebuilding Competition</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1a1008;
+  --bg-card: #2a1c0e;
+  --bg-input: #3a2a18;
+  --border: #5a3a1a;
+  --text: #f0dcc0;
+  --text-dim: #a08060;
+  --orange: #e87020;
+  --amber: #f0a030;
+  --gold: #ffd700;
+  --green: #40a040;
+  --green-dim: #1a3a1a;
+  --red: #d03030;
+  --red-dim: #3a1010;
+  --radius: 10px;
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.screen { display: none; padding: 16px; padding-bottom: 100px; max-width: 600px; margin: 0 auto; }
+.screen.active { display: block; }
+
+h1 { font-size: 1.5rem; text-align: center; color: var(--amber); margin-bottom: 16px; }
+h2 { font-size: 1.2rem; color: var(--amber); margin-bottom: 12px; }
+h3 { font-size: 1rem; color: var(--text-dim); margin-bottom: 8px; }
+
+.btn {
+  display: block; width: 100%; padding: 14px 16px; margin-bottom: 10px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-card); color: var(--text); font-size: 1rem;
+  cursor: pointer; text-align: left; transition: background 0.15s;
+}
+.btn:active { background: var(--bg-input); }
+.btn-orange { background: var(--orange); color: #fff; border-color: var(--orange); text-align: center; font-weight: 600; }
+.btn-orange:active { background: #c05818; }
+.btn-red { background: var(--red); color: #fff; border-color: var(--red); text-align: center; }
+.btn-red:active { background: #a02020; }
+.btn-green { background: var(--green); color: #fff; border-color: var(--green); text-align: center; font-weight: 600; }
+.btn-green:active { background: #308030; }
+.btn-sm { display: inline-block; width: auto; padding: 8px 16px; font-size: 0.9rem; }
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; text-align: center; flex-shrink: 0; }
+
+.nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.nav-grid .btn { text-align: center; padding: 20px 12px; }
+.nav-grid .btn .nav-emoji { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+
+input[type="text"], input[type="number"], select {
+  width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-input); color: var(--text); font-size: 1rem;
+}
+input[type="number"] { text-align: center; -moz-appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.input-row input { flex: 1; }
+
+.competitor-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; margin-bottom: 6px; border-radius: var(--radius);
+  background: var(--bg-card); border: 1px solid var(--border); cursor: pointer;
+}
+.competitor-item.scored { background: var(--green-dim); border-color: var(--green); }
+.competitor-item .name { flex: 1; font-size: 1rem; }
+.competitor-item .badge { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: var(--green); color: #fff; }
+.competitor-item .remove-btn { color: var(--red); font-size: 1.2rem; padding: 4px 8px; cursor: pointer; background: none; border: none; }
+
+.criterion-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.criterion-row label { flex: 1; font-size: 0.95rem; line-height: 1.3; }
+.criterion-row .max { color: var(--text-dim); font-size: 0.8rem; white-space: nowrap; }
+.criterion-row input[type="number"] { width: 70px; flex-shrink: 0; }
+
+.total-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--bg-input); border-radius: var(--radius); margin: 16px 0; font-size: 1.2rem; font-weight: 600; }
+.total-bar .pts { color: var(--amber); }
+
+.lb-item { display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+.lb-rank { font-size: 1.4rem; font-weight: 700; color: var(--amber); width: 36px; text-align: center; flex-shrink: 0; }
+.lb-rank.r1 { color: var(--gold); }
+.lb-rank.r2 { color: #c0c0c0; }
+.lb-rank.r3 { color: #cd7f32; }
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+.lb-score { font-size: 0.9rem; color: var(--amber); margin-bottom: 6px; }
+.lb-bar-bg { height: 8px; background: var(--bg-input); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.lb-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--amber)); border-radius: 4px; transition: width 0.3s; }
+.lb-cats { display: flex; flex-wrap: wrap; gap: 4px; }
+.lb-cat { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: var(--bg-input); color: var(--text-dim); }
+
+.timer-display { text-align: center; padding: 40px 16px; }
+.timer-time { font-size: 5rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--amber); line-height: 1; margin-bottom: 20px; }
+.timer-time.urgent { color: var(--red); animation: pulse 1s infinite; }
+.timer-time.done { color: var(--red); }
+.timer-label { font-size: 1.5rem; color: var(--text-dim); margin-bottom: 30px; }
+.timer-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.timer-controls .btn { width: auto; min-width: 120px; text-align: center; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--green); color: #fff; padding: 12px 24px; border-radius: var(--radius);
+  font-size: 0.95rem; z-index: 1000; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+.back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.back-bar h1 { margin-bottom: 0; flex: 1; text-align: left; }
+
+.ref-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 0.85rem; }
+.ref-table th { text-align: left; padding: 6px 8px; color: var(--amber); border-bottom: 1px solid var(--border); }
+.ref-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.ref-table td:last-child { text-align: right; color: var(--text-dim); white-space: nowrap; }
+
+.timer-config { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; justify-content: center; }
+.timer-config label { color: var(--text-dim); }
+.timer-config input { width: 80px; }
+
+.admin-section { margin-bottom: 24px; }
+.admin-section h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+.empty-state { text-align: center; color: var(--text-dim); padding: 40px 16px; font-size: 1rem; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <h1>Scout Firebuilding Competition</h1>
+  <div class="nav-grid">
+    <button class="btn" onclick="showScreen('admin')"><span class="nav-emoji">&#9881;</span>Admin</button>
+    <button class="btn" onclick="showScreen('timer-view')"><span class="nav-emoji">&#9201;</span>Timer</button>
+    <button class="btn" onclick="showJudge(0)"><span class="nav-emoji">&#128737;</span>Safety</button>
+    <button class="btn" onclick="showJudge(1)"><span class="nav-emoji">&#128293;</span>Fire Lay</button>
+    <button class="btn" onclick="showJudge(2)"><span class="nav-emoji">&#128736;</span>Technique</button>
+    <button class="btn" onclick="showJudge(3)"><span class="nav-emoji">&#127775;</span>Fire Performance</button>
+    <button class="btn" onclick="showJudge(4)"><span class="nav-emoji">&#127807;</span>LNT / Cleanup</button>
+    <button class="btn btn-orange" onclick="showScreen('leaderboard')" style="grid-column: 1 / -1"><span class="nav-emoji">&#127942;</span>Leaderboard</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <div class="back-bar">
+    <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
+    <h1>Admin</h1>
+  </div>
+
+  <div class="admin-section">
+    <h2>Competitors</h2>
+    <div class="input-row">
+      <input type="text" id="newName" placeholder="Competitor name" maxlength="60"
+             onkeydown="if(event.key==='Enter')addCompetitor()">
+      <button class="btn btn-orange btn-sm" onclick="addCompetitor()">Add</button>
+    </div>
+    <div id="competitorList"></div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Timer</h2>
+    <div class="timer-config">
+      <label>Duration:</label>
+      <input type="number" id="timerMinutes" min="1" max="120" value="10">
+      <label>min</label>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-green" onclick="startTimer()" style="flex:1">Start Timer</button>
+      <button class="btn btn-red" onclick="stopTimer()" style="flex:1">Stop Timer</button>
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <h2>Data Management</h2>
+    <button class="btn btn-red" onclick="resetScores()">Reset All Scores</button>
+    <button class="btn btn-red" onclick="clearEverything()">Clear Everything</button>
+  </div>
+</div>
+
+<!-- JUDGE LIST -->
+<div id="judge" class="screen">
+  <div class="back-bar">
+    <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
+    <h1 id="judgeTitle"></h1>
+  </div>
+  <div class="card" id="judgeRef"></div>
+  <h3 style="margin-top:16px">Tap a competitor to score:</h3>
+  <div id="judgeCompetitors"></div>
+</div>
+
+<!-- SCORING -->
+<div id="scoring" class="screen">
+  <div class="back-bar">
+    <button class="btn btn-icon" onclick="backToJudge()">&#8592;</button>
+    <h1 id="scoringTitle"></h1>
+  </div>
+  <div id="scoringCriteria"></div>
+  <div class="total-bar">
+    <span>Total</span>
+    <span class="pts" id="scoringTotal">0 / 0</span>
+  </div>
+  <button class="btn btn-green" onclick="submitScore()">Submit Score</button>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="screen">
+  <div class="back-bar">
+    <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
+    <h1>Leaderboard</h1>
+  </div>
+  <button class="btn btn-sm btn-orange" onclick="renderLeaderboard()" style="margin-bottom:16px;width:100%;text-align:center">Refresh</button>
+  <div id="leaderboardList"></div>
+</div>
+
+<!-- TIMER VIEW -->
+<div id="timer-view" class="screen">
+  <div class="back-bar">
+    <button class="btn btn-icon" onclick="showScreen('home')">&#8592;</button>
+    <h1>Timer</h1>
+  </div>
+  <div class="timer-display">
+    <div id="timerLabel" class="timer-label">Ready</div>
+    <div id="timerDisplay" class="timer-time">--:--</div>
+    <div class="timer-controls">
+      <button class="btn btn-green btn-sm" onclick="startTimer()">Start</button>
+      <button class="btn btn-red btn-sm" onclick="stopTimer()">Stop</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+
+// --- Categories ---
+var CATEGORIES = [
+  { name: 'Safety', max: 25, criteria: [
+    { label: 'Safety zone maintained', max: 10 },
+    { label: 'Safe match/tool handling', max: 8 },
+    { label: 'Fire safety awareness', max: 7 }
+  ]},
+  { name: 'Fire Lay', max: 25, criteria: [
+    { label: 'Tinder \u2192 kindling \u2192 fuel progression', max: 10 },
+    { label: 'Structurally sound lay', max: 10 },
+    { label: 'Correct lay style', max: 5 }
+  ]},
+  { name: 'Technique', max: 20, criteria: [
+    { label: 'Works efficiently', max: 8 },
+    { label: 'Minimal matches (1 match = full pts)', max: 10 },
+    { label: 'Explains process when asked', max: 2 }
+  ]},
+  { name: 'Fire Performance', max: 20, criteria: [
+    { label: 'Fire ignites', max: 10 },
+    { label: 'Sustains 3\u20135 min', max: 5 },
+    { label: 'Burns through suspended string', max: 5 }
+  ]},
+  { name: 'LNT / Cleanup', max: 10, criteria: [
+    { label: 'Fire cold to touch', max: 5 },
+    { label: 'Area restored', max: 3 },
+    { label: 'Ash disposed properly', max: 2 }
+  ]}
+];
+
+var MAX_TOTAL = 100;
+
+// --- Utility ---
+function esc(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function() { el.classList.remove('show'); }, 2200);
+}
+
+// --- Storage ---
+function getCompetitors() {
+  try { return JSON.parse(localStorage.getItem('fb_competitors')) || []; }
+  catch(e) { return []; }
+}
+function saveCompetitors(list) { localStorage.setItem('fb_competitors', JSON.stringify(list)); }
+
+function getScores() {
+  try { return JSON.parse(localStorage.getItem('fb_scores')) || {}; }
+  catch(e) { return {}; }
+}
+function saveScores(obj) { localStorage.setItem('fb_scores', JSON.stringify(obj)); }
+
+function getTimerState() {
+  try { return JSON.parse(localStorage.getItem('fb_timer')) || null; }
+  catch(e) { return null; }
+}
+function saveTimerState(obj) { localStorage.setItem('fb_timer', JSON.stringify(obj)); }
+
+// --- Navigation ---
+var currentCatIdx = 0;
+var currentCompetitor = '';
+
+function showScreen(id) {
+  var screens = document.querySelectorAll('.screen');
+  for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  if (id === 'admin') renderAdmin();
+  if (id === 'leaderboard') renderLeaderboard();
+  if (id === 'timer-view') renderTimerView();
+  window.scrollTo(0, 0);
+}
+
+// --- Admin ---
+function renderAdmin() {
+  var list = getCompetitors();
+  var el = document.getElementById('competitorList');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state">No competitors added yet.</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < list.length; i++) {
+    html += '<div class="competitor-item">' +
+      '<span class="name">' + esc(list[i]) + '</span>' +
+      '<button class="remove-btn" onclick="removeCompetitor(' + i + ')" title="Remove">&times;</button>' +
+    '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function addCompetitor() {
+  var input = document.getElementById('newName');
+  var name = input.value.trim();
+  if (!name) return;
+  var list = getCompetitors();
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].toLowerCase() === name.toLowerCase()) {
+      toast('Competitor already exists');
+      return;
+    }
+  }
+  list.push(name);
+  saveCompetitors(list);
+  input.value = '';
+  renderAdmin();
+  toast('Added ' + name);
+}
+
+function removeCompetitor(idx) {
+  var list = getCompetitors();
+  var name = list[idx];
+  if (!confirm('Remove competitor "' + name + '"?\nThis will also delete their scores.')) return;
+  list.splice(idx, 1);
+  saveCompetitors(list);
+  var scores = getScores();
+  delete scores[name];
+  saveScores(scores);
+  renderAdmin();
+  toast('Removed ' + name);
+}
+
+function resetScores() {
+  if (!confirm('Reset ALL scores for every competitor?\nCompetitors will be kept.')) return;
+  saveScores({});
+  toast('All scores reset');
+}
+
+function clearEverything() {
+  if (!confirm('Delete ALL competitors, scores, and timer?\nThis cannot be undone.')) return;
+  localStorage.removeItem('fb_competitors');
+  localStorage.removeItem('fb_scores');
+  localStorage.removeItem('fb_timer');
+  stopTimer();
+  renderAdmin();
+  toast('Everything cleared');
+}
+
+// --- Judge ---
+function showJudge(catIdx) {
+  currentCatIdx = catIdx;
+  var cat = CATEGORIES[catIdx];
+  document.getElementById('judgeTitle').textContent = cat.name + ' (' + cat.max + 'pts)';
+
+  // Reference table
+  var ref = '<table class="ref-table"><tr><th>Criterion</th><th>Max</th></tr>';
+  for (var i = 0; i < cat.criteria.length; i++) {
+    ref += '<tr><td>' + esc(cat.criteria[i].label) + '</td><td>' + cat.criteria[i].max + '</td></tr>';
+  }
+  ref += '</table>';
+  document.getElementById('judgeRef').innerHTML = ref;
+
+  renderJudgeList();
+  showScreen('judge');
+}
+
+function renderJudgeList() {
+  var list = getCompetitors();
+  var scores = getScores();
+  var cat = CATEGORIES[currentCatIdx];
+  var el = document.getElementById('judgeCompetitors');
+
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state">No competitors. Add them in Admin.</div>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < list.length; i++) {
+    var name = list[i];
+    var hasScore = scores[name] && scores[name][currentCatIdx] !== undefined;
+    var scoreTotal = 0;
+    if (hasScore) {
+      var vals = scores[name][currentCatIdx];
+      for (var j = 0; j < vals.length; j++) scoreTotal += (vals[j] || 0);
+    }
+    html += '<div class="competitor-item' + (hasScore ? ' scored' : '') + '" onclick="openScoring(\'' + esc(name).replace(/'/g, "\\'") + '\')">' +
+      '<span class="name">' + esc(name) + '</span>' +
+      (hasScore ? '<span class="badge">' + scoreTotal + '/' + cat.max + '</span>' : '') +
+    '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function backToJudge() {
+  renderJudgeList();
+  showScreen('judge');
+}
+
+// --- Scoring ---
+function openScoring(name) {
+  currentCompetitor = name;
+  var cat = CATEGORIES[currentCatIdx];
+  document.getElementById('scoringTitle').textContent = esc(name);
+
+  var scores = getScores();
+  var existing = (scores[name] && scores[name][currentCatIdx]) || [];
+
+  var html = '<h2>' + esc(cat.name) + '</h2>';
+  for (var i = 0; i < cat.criteria.length; i++) {
+    var c = cat.criteria[i];
+    var val = existing[i] !== undefined ? existing[i] : '';
+    html += '<div class="criterion-row">' +
+      '<label>' + esc(c.label) + '</label>' +
+      '<span class="max">/ ' + c.max + '</span>' +
+      '<input type="number" min="0" max="' + c.max + '" value="' + val + '" ' +
+        'data-max="' + c.max + '" class="score-input" ' +
+        'oninput="clampAndSum(this)" inputmode="numeric">' +
+    '</div>';
+  }
+  document.getElementById('scoringCriteria').innerHTML = html;
+  updateScoringTotal();
+  showScreen('scoring');
+}
+
+function clampAndSum(input) {
+  var max = parseInt(input.getAttribute('data-max'));
+  var val = parseInt(input.value);
+  if (val > max) { input.value = max; }
+  if (val < 0) { input.value = 0; }
+  updateScoringTotal();
+}
+
+function updateScoringTotal() {
+  var inputs = document.querySelectorAll('.score-input');
+  var total = 0;
+  var catMax = CATEGORIES[currentCatIdx].max;
+  for (var i = 0; i < inputs.length; i++) {
+    var v = parseInt(inputs[i].value);
+    if (!isNaN(v)) total += v;
+  }
+  document.getElementById('scoringTotal').textContent = total + ' / ' + catMax;
+}
+
+function submitScore() {
+  var inputs = document.querySelectorAll('.score-input');
+  var vals = [];
+  for (var i = 0; i < inputs.length; i++) {
+    var v = parseInt(inputs[i].value);
+    vals.push(isNaN(v) ? 0 : v);
+  }
+
+  var scores = getScores();
+  if (!scores[currentCompetitor]) scores[currentCompetitor] = {};
+  scores[currentCompetitor][currentCatIdx] = vals;
+  saveScores(scores);
+
+  toast('Score saved for ' + currentCompetitor);
+  backToJudge();
+}
+
+// --- Leaderboard ---
+function renderLeaderboard() {
+  var list = getCompetitors();
+  var scores = getScores();
+  var el = document.getElementById('leaderboardList');
+
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state">No competitors yet.</div>';
+    return;
+  }
+
+  var entries = [];
+  for (var i = 0; i < list.length; i++) {
+    var name = list[i];
+    var total = 0;
+    var catScores = [];
+    for (var c = 0; c < CATEGORIES.length; c++) {
+      var catTotal = 0;
+      if (scores[name] && scores[name][c]) {
+        var vals = scores[name][c];
+        for (var j = 0; j < vals.length; j++) catTotal += (vals[j] || 0);
+      }
+      catScores.push(catTotal);
+      total += catTotal;
+    }
+    entries.push({ name: name, total: total, cats: catScores });
+  }
+
+  entries.sort(function(a, b) { return b.total - a.total; });
+
+  var html = '';
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    var pct = MAX_TOTAL > 0 ? Math.round((e.total / MAX_TOTAL) * 100) : 0;
+    var rankClass = i === 0 ? ' r1' : i === 1 ? ' r2' : i === 2 ? ' r3' : '';
+    html += '<div class="lb-item">' +
+      '<div class="lb-rank' + rankClass + '">' + (i + 1) + '</div>' +
+      '<div class="lb-info">' +
+        '<div class="lb-name">' + esc(e.name) + '</div>' +
+        '<div class="lb-score">' + e.total + ' / ' + MAX_TOTAL + ' pts</div>' +
+        '<div class="lb-bar-bg"><div class="lb-bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="lb-cats">';
+    for (var c = 0; c < CATEGORIES.length; c++) {
+      html += '<span class="lb-cat">' + esc(CATEGORIES[c].name) + ': ' + e.cats[c] + '/' + CATEGORIES[c].max + '</span>';
+    }
+    html += '</div></div></div>';
+  }
+  el.innerHTML = html;
+}
+
+// --- Timer ---
+var timerInterval = null;
+
+function startTimer() {
+  var minInput = document.getElementById('timerMinutes');
+  var state = getTimerState();
+  var totalSec;
+
+  if (state && state.running && state.endTime > Date.now()) {
+    // already running
+    toast('Timer already running');
+    showScreen('timer-view');
+    return;
+  }
+
+  totalSec = parseInt(minInput.value) * 60;
+  if (isNaN(totalSec) || totalSec < 1) { toast('Invalid duration'); return; }
+
+  var endTime = Date.now() + totalSec * 1000;
+  saveTimerState({ running: true, endTime: endTime, duration: totalSec });
+  tickTimer();
+  toast('Timer started');
+  showScreen('timer-view');
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  saveTimerState(null);
+  var display = document.getElementById('timerDisplay');
+  var label = document.getElementById('timerLabel');
+  if (display) { display.textContent = '--:--'; display.className = 'timer-time'; }
+  if (label) label.textContent = 'Ready';
+  toast('Timer stopped');
+}
+
+function tickTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 250);
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  var state = getTimerState();
+  var display = document.getElementById('timerDisplay');
+  var label = document.getElementById('timerLabel');
+  if (!display) return;
+
+  if (!state || !state.running) {
+    display.textContent = '--:--';
+    display.className = 'timer-time';
+    label.textContent = 'Ready';
+    clearInterval(timerInterval);
+    return;
+  }
+
+  var remaining = Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
+  var min = Math.floor(remaining / 60);
+  var sec = remaining % 60;
+  display.textContent = (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+
+  if (remaining <= 0) {
+    display.textContent = "TIME'S UP";
+    display.className = 'timer-time done';
+    label.textContent = '';
+    clearInterval(timerInterval);
+    saveTimerState({ running: false, endTime: state.endTime, duration: state.duration });
+  } else if (remaining <= 60) {
+    display.className = 'timer-time urgent';
+    label.textContent = 'FINAL MINUTE';
+  } else {
+    display.className = 'timer-time';
+    label.textContent = 'Time Remaining';
+  }
+}
+
+function renderTimerView() {
+  var state = getTimerState();
+  if (state && state.running && state.endTime > Date.now()) {
+    tickTimer();
+  } else if (state && !state.running) {
+    var display = document.getElementById('timerDisplay');
+    var label = document.getElementById('timerLabel');
+    display.textContent = "TIME'S UP";
+    display.className = 'timer-time done';
+    label.textContent = '';
+  } else {
+    updateTimerDisplay();
+  }
+}
+
+// Resume timer on page load
+(function() {
+  var state = getTimerState();
+  if (state && state.running && state.endTime > Date.now()) {
+    tickTimer();
+  }
+})();
+</script>
+</body>
+</html>
